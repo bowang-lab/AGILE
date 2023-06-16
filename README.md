@@ -1,6 +1,6 @@
 # AGILE
 
-This is the official codebase for **AGILE Platform: A Deep Learning-Powered Approach to Accelerate LNP Development for mRNA Delivery**.
+This is the official codebase for **AGILE Platform: A Deep Learning-Powered Approach to Accelerate LNP Development for mRNA Delivery**.[[biorXiv]](https://www.biorxiv.org/content/10.1101/2023.06.01.543345v1.abstract)
 
 ## Introduction
 
@@ -22,11 +22,20 @@ An overview of AGILE can be seen below:
 ## Future Release Plan
 
 - [x] Initial release
+- [ ] Release data
 - [ ] Release model code
 - [ ] Release model pretraining, fine-tuning scripts
-- [ ] Release data
+
 
 ## Citing AGILE
 
 ```bibtex
+@article{xu2023agile,
+  title={AGILE Platform: A Deep Learning-Powered Approach to Accelerate LNP Development for mRNA Delivery},
+  author={Xu, Yue and Ma, Shihao and Cui, Haotian and Chen, Jingan and Xu, Shufen and Wang, Kevin and Varley, Andrew and Lu, Rick Xing Ze and Bo, Wang and Li, Bowen},
+  journal={bioRxiv},
+  pages={2023--06},
+  year={2023},
+  publisher={Cold Spring Harbor Laboratory}
+}
 ```
