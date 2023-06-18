@@ -22,7 +22,7 @@ An overview of AGILE can be seen below:
 ## Future Release Plan
 
 - [x] Initial release
-- [ ] Release data
+- [x] Release data
 - [ ] Release model code
 - [ ] Release model pretraining, fine-tuning scripts
 
