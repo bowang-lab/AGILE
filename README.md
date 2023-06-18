@@ -23,8 +23,8 @@ An overview of AGILE can be seen below:
 
 - [x] Initial release
 - [x] Release data
-- [ ] Release model code
-- [ ] Release model pretraining, fine-tuning scripts
+- [x] Release model code
+- [x] Release model pretraining, fine-tuning scripts
 
 
 ## Citing AGILE
