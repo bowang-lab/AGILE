@@ -37,7 +37,7 @@ $ pip install -r requirements.txt
 ```
 ### Pre-training
 
-To pre-train AGILE with your own data, you can modify the configurations in `config_pretrain.yaml`. The pretraining is inherited from 
+The continuous pretraining of AGILE is inherited from [MolCLR](https://www.nature.com/articles/s42256-022-00447-x), the pre-trained MolCLR models can be found in [link](https://github.com/yuyangw/MolCLR). To pre-train with your own data, you can modify the configurations in `config_pretrain.yaml`. 
 ```
 $ python pretrain.py config_pretrain.yaml
 ```
