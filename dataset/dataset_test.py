@@ -1,3 +1,8 @@
+# Copyright (c) 2023 Shihao Ma, Haotian Cui, WangLab @ U of T
+
+# This source code is modified from https://github.com/yuyangw/MolCLR 
+# under MIT License. The original license is included below:
+# ========================================================================
 # MIT License
 
 # Copyright (c) 2021 Yuyang Wang

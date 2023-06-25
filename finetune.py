@@ -380,7 +380,7 @@ if __name__ == "__main__":
         config["dataset"]["task"] = "regression"
         config["dataset"][
             "data_path"
-        ] = "data/LNP_1200/mordred_smiles_plus_selected_normed_feat.csv"
+        ] = "data/finetuning_set_smiles_plus_features.csv"
         target_list = ["expt_Hela"]
         config["dataset"]["feature_cols"] = get_desc_cols(
             config["dataset"]["data_path"]
@@ -393,7 +393,7 @@ if __name__ == "__main__":
         config["dataset"]["task"] = "regression"
         config["dataset"][
             "data_path"
-        ] = "data/LNP_1200/mordred_smiles_plus_selected_normed_feat.csv"
+        ] = "data/finetuning_set_smiles_plus_features.csv"
         target_list = ["expt_Raw"]
         config["dataset"]["feature_cols"] = get_desc_cols(
             config["dataset"]["data_path"]
