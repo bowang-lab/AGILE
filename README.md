@@ -62,3 +62,6 @@ $ python finetune.py config_finetune.yaml
   publisher={Cold Spring Harbor Laboratory}
 }
 ```
+## Acknowledgement
+
+- MolCLR: [https://github.com/yuyangw/MolCLR](https://github.com/yuyangw/MolCLR)
