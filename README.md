@@ -19,13 +19,36 @@ An overview of AGILE can be seen below:
 </p>
 
 
-## Future Release Plan
+## Getting Started
 
-- [x] Initial release
-- [x] Release data
-- [x] Release model code
-- [x] Release model pretraining, fine-tuning scripts
+### Installation
 
+Set up conda environment and clone the github repo
+
+```
+# create a new environment
+$ conda create --name agile python=3.9 -y
+$ conda activate agile
+
+# install requirements
+$ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113  --extra-index-url https://download.pytorch.org/whl/cu113
+$ pip install torch-geometric==2.2.0 torch-sparse==0.6.16 torch-scatter==2.1.0 -f https://data.pyg.org/whl/torch-1.12.0+cu113.html
+$ pip install -r requirements.txt
+```
+### Pre-training
+
+To pre-train AGILE with your own data, you can modify the configurations in `config_pretrain.yaml`. The pretraining is inherited from 
+```
+$ python pretrain.py config_pretrain.yaml
+```
+
+### Fine-tuning
+
+To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the specific cell lines, you can modify the configurations in `config_finetune.yaml`. We have provided the pre-trained AGILE model on the 60k virtual lipid library, which can be found in `ckpt/pretrained_agile_60k`.
+
+```
+$ python finetune.py config_finetune.yaml
+```
 
 ## Citing AGILE
 
