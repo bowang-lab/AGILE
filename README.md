@@ -65,3 +65,4 @@ $ python finetune.py config_finetune.yaml
 ## Acknowledgement
 
 - MolCLR: [https://github.com/yuyangw/MolCLR](https://github.com/yuyangw/MolCLR)
+- Mordred: [https://github.com/mordred-descriptor/mordred](https://github.com/mordred-descriptor/mordred)
