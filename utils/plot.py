@@ -41,3 +41,30 @@ def _image_scatter(x, y, imgs, subtitles, colors, ax, offset=0):
 
         bbs.append(bb)
     return bbs
+
+# custom colormap
+facecolors_customize = [
+    "#a6d9daff",
+    "#96c9ccff",
+    "#91bfc2ff",
+    "#8cb7baff",
+    "#8aafb2ff",
+    "#87a5aaff",
+    "#849d9fff",
+    "#829495ff",
+    "#829091ff",
+    "#828c8bff",
+    "#828486ff",
+    "#828282ff",
+    "#807a7dff",
+    "#79727aff",
+    "#726674ff",
+    "#6a596fff",
+    "#624e67ff",
+    "#5a4261ff",
+    "#513957ff",
+    "#492f4fff",
+    "#40263eff",
+    "#39233fff",
+    "#32203fff",
+]
