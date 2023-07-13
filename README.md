@@ -50,6 +50,14 @@ To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the s
 $ python finetune.py config_finetune.yaml
 ```
 
+### Inference and visualization
+
+The current 'infer_vis.py' will perform model inference with the AGILE fine-tuned model on the fine-tuning dataset. To perform inference on new data, you can modify the config file to specify the new data path.
+
+```
+$ python infer_vis.py <folder name of the fine-tuned model>
+```
+
 ## Citing AGILE
 
 ```bibtex
