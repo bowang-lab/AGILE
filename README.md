@@ -82,13 +82,29 @@ Then run:
 $ python finetune.py config_finetune.yaml
 ```
 
+The fine-tuned AGILE model will be stored in `./finetune`.
+
 ### Inference and visualization
 
-The current 'infer_vis.py' will perform model inference with the AGILE fine-tuned model on the fine-tuning dataset. To perform inference on new data, you can modify the config file to specify the new data path.
+
+To perform model inference with the fine-tuned AGILE model, you can run the following command:
 
 ```
 $ python infer_vis.py <folder name of the fine-tuned model>
 ```
+
+Note that the 'infer_vis.py' will pick up the config yaml file from the fine-tuned AGILE model folder. So the above command will perform model inference with the specified AGILE fine-tuned model on the fine-tuning dataset. To perform inference on new data, you will need to modify the config file with a new `task_name` and modify the `data_path` field in the `infer_vis.py`:
+
+```
+config["dataset"]["task"] = "regression"                                             # keep it the same
+config["dataset"]["data_path"] = "data/candidate_set_smiles_plus_features.csv"       # change it to the path of your own inference dataset
+target_list = ["desc_ABC/10"]                                                        # it will be the dummy label for visualization
+config["dataset"]["feature_cols"] = get_desc_cols(config["dataset"]["data_path"])    # keep it the same if you have additional features
+config["model"]["pred_additional_feat_dim"] = len(config["dataset"]["feature_cols"]) # keep it the same if you have additional features
+```
+
+The predicted output (in .csv file) and visualization plots (in .png files) will be stored in the same fine-tuned AGILE model folder.
+
 
 ## Citing AGILE
 
