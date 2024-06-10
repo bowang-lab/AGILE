@@ -65,10 +65,19 @@ $ python pretrain.py config_pretrain.yaml
 
 ### Fine-tuning
 
+To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the specific cell lines, you can modify the configurations in `config_finetune.yaml`. 
 
+If you would like to fine-tune AGILE with your own dataset, create your own `task_name` in the config file, and modify the following fields in the `finetune.py`:
 
-To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the specific cell lines, you can modify the configurations in `config_finetune.yaml`. We have provided the pre-trained AGILE model on the 60k virtual lipid library, which can be found in `ckpt/pretrained_agile_60k`.
+```
+config["dataset"]["task"] = "regression"                                             # keep it the same
+config["dataset"]["data_path"] = "data/finetuning_set_smiles_plus_features.csv"      # change it to the path of your own fine-tunning dataset
+target_list = ["expt_Hela"]                                                          # change it to the column name of the regression labels
+config["dataset"]["feature_cols"] = get_desc_cols(config["dataset"]["data_path"])    # keep it the same if you have additional features
+config["model"]["pred_additional_feat_dim"] = len(config["dataset"]["feature_cols"]) # keep it the same if you have additional features
+```
 
+Then run:
 ```
 $ python finetune.py config_finetune.yaml
 ```
