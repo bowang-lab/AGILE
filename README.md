@@ -23,14 +23,17 @@ An overview of AGILE can be seen below:
 
 ### Installation
 
-Set up conda environment and clone the github repo
+Clone the github repo and set up conda environment 
 
 ```
-# create a new environment
+# Clone the GitHub Repository
+$ git clone <this-repo-url>
+
+# Create a new environment
 $ conda create --name agile python=3.9 -y
 $ conda activate agile
 
-# install requirements
+# Install PyTorch and torchvision with CUDA support. Make sure the versions are compatible with your CUDA version.
 $ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113  --extra-index-url https://download.pytorch.org/whl/cu113
 $ pip install torch-geometric==2.2.0 torch-sparse==0.6.16 torch-scatter==2.1.0 -f https://data.pyg.org/whl/torch-1.12.0+cu113.html
 $ pip install -r requirements.txt
