@@ -40,7 +40,19 @@ $ pip install -r requirements.txt
 ```
 ### Pre-training
 
-The continuous pretraining of AGILE is inherited from [MolCLR](https://www.nature.com/articles/s42256-022-00447-x), the pre-trained MolCLR models can be found in [link](https://github.com/yuyangw/MolCLR). To pre-train with your own data, you can modify the configurations in `config_pretrain.yaml`. 
+The pre-trained AGILE model on the 60k virtual lipid library can be found in `ckpt/pretrained_agile_60k`. If your data significantly differs from the 60k virtual lipid library, the pre-trained AGILE model might not perform optimally. In such cases, you can pre-train the model with your own dataset to potentially achieve better results.
+
+Steps to Pre-train with Your Data:
+1. **Obtain Pre-trained Base Models**: Download the pre-trained [MolCLR](https://www.nature.com/articles/s42256-022-00447-x) models, which serve as a starting point for further training. These models are available at [here](https://github.com/yuyangw/MolCLR).
+
+1. **Set Up the Model Directory**:
+Place the downloaded MolCLR model files in the `./ckpt` directory within your project folder. This ensures they are properly accessed by the training script.
+
+1. **Configure Training Settings**:
+Open the `config_pretrain.yaml` file and make the following adjustments:
+- `load_model`: Change this to the model name of your downloaded MolCLR model.
+- `data_path`: Specify the path to your dataset where the training data is stored.
+
 ```
 $ python pretrain.py config_pretrain.yaml
 ```
