@@ -38,17 +38,46 @@ $ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113  --extra-index-url h
 $ pip install torch-geometric==2.2.0 torch-sparse==0.6.16 torch-scatter==2.1.0 -f https://data.pyg.org/whl/torch-1.12.0+cu113.html
 $ pip install -r requirements.txt
 ```
+
+### Dataset
+
+We have provided the fine-tuning library and candidate library used in the paper in `data.zip`, extract the zip file under `./data` folder. 
+
 ### Pre-training
 
-The continuous pretraining of AGILE is inherited from [MolCLR](https://www.nature.com/articles/s42256-022-00447-x), the pre-trained MolCLR models can be found in [link](https://github.com/yuyangw/MolCLR). To pre-train with your own data, you can modify the configurations in `config_pretrain.yaml`. 
+The pre-trained AGILE model on the 60k virtual lipid library can be found in `ckpt/pretrained_agile_60k`. If your data significantly differs from the 60k virtual lipid library, the pre-trained AGILE model might not perform optimally. In such cases, you can pre-train the model with your own dataset to potentially achieve better results.
+
+Steps to Pre-train with Your Data:
+1. **Obtain Pre-trained Base Models**: Download the pre-trained [MolCLR](https://www.nature.com/articles/s42256-022-00447-x) models, which serve as a starting point for further training. These models are available at [here](https://github.com/yuyangw/MolCLR).
+
+1. **Set Up the Model Directory**:
+Place the downloaded MolCLR model files in the `./ckpt` directory within your project folder. This ensures they are properly accessed by the training script.
+
+1. **Configure Training Settings**:
+Open the `config_pretrain.yaml` file and make the following adjustments:
+- `load_model`: Change this to the model name of your downloaded MolCLR model.
+- `data_path`: Specify the path to your dataset where the training data is stored.
+
 ```
 $ python pretrain.py config_pretrain.yaml
 ```
 
+
 ### Fine-tuning
 
-To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the specific cell lines, you can modify the configurations in `config_finetune.yaml`. We have provided the pre-trained AGILE model on the 60k virtual lipid library, which can be found in `ckpt/pretrained_agile_60k`.
+To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the specific cell lines, you can modify the configurations in `config_finetune.yaml`. 
 
+If you would like to fine-tune AGILE with your own dataset, create your own `task_name` in the config file, and modify the following fields in the `finetune.py`:
+
+```
+config["dataset"]["task"] = "regression"                                             # keep it the same
+config["dataset"]["data_path"] = "data/finetuning_set_smiles_plus_features.csv"      # change it to the path of your own fine-tunning dataset
+target_list = ["expt_Hela"]                                                          # change it to the column name of the regression labels
+config["dataset"]["feature_cols"] = get_desc_cols(config["dataset"]["data_path"])    # keep it the same if you have additional features
+config["model"]["pred_additional_feat_dim"] = len(config["dataset"]["feature_cols"]) # keep it the same if you have additional features
+```
+
+Then run:
 ```
 $ python finetune.py config_finetune.yaml
 ```
