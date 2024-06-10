@@ -38,6 +38,11 @@ $ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113  --extra-index-url h
 $ pip install torch-geometric==2.2.0 torch-sparse==0.6.16 torch-scatter==2.1.0 -f https://data.pyg.org/whl/torch-1.12.0+cu113.html
 $ pip install -r requirements.txt
 ```
+
+### Dataset
+
+We have provided the fine-tuning library and candidate library used in the paper in `data.zip`, extract the zip file under `./data` folder. 
+
 ### Pre-training
 
 The pre-trained AGILE model on the 60k virtual lipid library can be found in `ckpt/pretrained_agile_60k`. If your data significantly differs from the 60k virtual lipid library, the pre-trained AGILE model might not perform optimally. In such cases, you can pre-train the model with your own dataset to potentially achieve better results.
@@ -57,7 +62,10 @@ Open the `config_pretrain.yaml` file and make the following adjustments:
 $ python pretrain.py config_pretrain.yaml
 ```
 
+
 ### Fine-tuning
+
+
 
 To fine-tune the AGILE pre-trained model for ionizable lipid prediction on the specific cell lines, you can modify the configurations in `config_finetune.yaml`. We have provided the pre-trained AGILE model on the 60k virtual lipid library, which can be found in `ckpt/pretrained_agile_60k`.
 
