@@ -1,6 +1,8 @@
 # AGILE
 
-This is the official codebase for **AGILE Platform: A Deep Learning-Powered Approach to Accelerate LNP Development for mRNA Delivery**.[[biorXiv]](https://www.biorxiv.org/content/10.1101/2023.06.01.543345v1.abstract)
+This is the official codebase for **AGILE Platform: A Deep Learning-Powered Approach to Accelerate LNP Development for mRNA Delivery**.
+
+🥳 **Updates**: AGILE has been accepted to [[Nature Communications]](https://www.nature.com/articles/s41467-024-50619-z)!
 
 ## Introduction
 
