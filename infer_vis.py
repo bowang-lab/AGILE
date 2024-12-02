@@ -625,7 +625,6 @@ if __name__ == "__main__":
         config["model"]["pred_additional_feat_dim"] = len(
             config["dataset"]["feature_cols"]
         )
-        config["headtail_label_file"] = ""
 
     else:
         raise ValueError("Undefined downstream task!")
