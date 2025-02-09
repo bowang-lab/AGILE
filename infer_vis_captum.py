@@ -301,10 +301,10 @@ class Inference(object):
             feat_importance.append(attributions.detach().cpu().numpy())
         
         feat_importance = np.vstack(feat_importance)
-        df = pd.DataFrame(data=feat_importance, columns=self.config['dataset']['feature_cols']).to_csv(os.path.join(self.log_dir, f'feat_importance.csv'), index=False)
+        df = pd.DataFrame(data=feat_importance, columns=self.config['dataset']['feature_cols'])
+        df.to_csv(os.path.join(self.log_dir, f'feat_importance.csv'), index=False)
         
-
-        return attributions
+        return df
 
 
     def visualize(
@@ -504,6 +504,4 @@ if __name__ == "__main__":
         dataset = MolTestDatasetWrapper(config["batch_size"], **config["dataset"])
 
         infer_agent = Inference(dataset, config)
-        pred, embs, labels = infer_agent.inference()
-
-        attribute = infer_agent.interpret()
+        df_feature = infer_agent.interpret()
