@@ -293,15 +293,18 @@ class Inference(object):
         for bn, cur_samples in enumerate(data_loader):
             cur_samples = cur_samples.to(self.device)
 
+            batch_size = cur_samples.y.shape[0]
+
             attributions, approximation_error = interpret_method.attribute(cur_samples.feat,
-                                                            additional_forward_args=(cur_samples.x, cur_samples.edge_index, cur_samples.edge_attr, cur_samples.batch),
-                                                            internal_batch_size=self.config['batch_size'],
-                                                            return_convergence_delta=True)
+                                                additional_forward_args=(cur_samples.x, cur_samples.edge_index, cur_samples.edge_attr, cur_samples.batch),
+                                                internal_batch_size=batch_size,
+                                                return_convergence_delta=True)
 
             feat_importance.append(attributions.detach().cpu().numpy())
         
         feat_importance = np.vstack(feat_importance)
         df = pd.DataFrame(data=feat_importance, columns=self.config['dataset']['feature_cols'])
+        print(df.shape)
         df.to_csv(os.path.join(self.log_dir, f'feat_importance.csv'), index=False)
         
         return df
