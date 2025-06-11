@@ -7,12 +7,13 @@ fp16_precision: False # float precision 16 (i.e. True/False)
 init_lr: 0.0005 # initial learning rate for the prediction head
 init_base_lr: 0.0001 # initial learning rate for the base GNN encoder
 weight_decay: 1e-6 # weight decay of Adam
-gpu: "cpu" # training GPU
-task_name: lnp_spleen_with_feat # name of fine-tuning benchmark, inlcuding
+gpu: cuda:0 # training GPU
+task_name: smiles12000_with_feat # name of fine-tuning benchmark, inlcuding
+data_path: data/candidate_set_smiles_plus_features.csv
 
 
 model:
-  num_layer: 0 # number of graph conv layers
+  num_layer: 5 # number of graph conv layers
   emb_dim: 300 # embedding dimension in graph conv layers
   feat_dim: 512 # output feature dimention
   drop_ratio: 0.3 # dropout ratio

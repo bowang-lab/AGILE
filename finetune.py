@@ -402,6 +402,13 @@ if __name__ == "__main__":
             config["dataset"]["feature_cols"]
         )
 
+    elif config["task_name"] == "lnp_spleen_with_feat":
+        config["dataset"]["task"] = "regression"
+        config["dataset"]["data_path"] = "data/finetune_Spleen_smiles_plus_features.csv"
+        target_list = ["expt_Spleen"]
+        config["dataset"]["feature_cols"] = get_desc_cols(config["dataset"]["data_path"])
+        config["model"]["pred_additional_feat_dim"] = len(config["dataset"]["feature_cols"])
+
     else:
         raise ValueError("Undefined fine-tuning task!")
 

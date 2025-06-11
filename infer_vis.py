@@ -230,10 +230,10 @@ class Inference(object):
                 "label_rank": (-labels).argsort().argsort() + 1,
             }
         )
-        df.to_csv(
-            os.path.join(self.log_dir, f"preds_on_{config['task_name']}.csv"),
-            index=False,
-        )
+        # Ensure output directory exists before saving results
+        os.makedirs(self.log_dir, exist_ok=True)
+        result_csv = os.path.join(self.log_dir, f"{self.config['task_name']}_result.csv")
+        df.to_csv(result_csv, mode="a", index=False)
 
         return predictions, embeddings, labels
 
@@ -656,31 +656,28 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(results_list)
-    df.to_csv(
-        os.path.join(
-            infer_agent.log_dir,
-            f"{config['model_to_evaluate']}_{config['task_name']}_result.csv",
-        ),
-        mode="a",
-        index=False,
-    )
+    # Ensure output directory exists before saving results
+    os.makedirs(infer_agent.log_dir, exist_ok=True)
+    result_csv = os.path.join(infer_agent.log_dir, f"{config['task_name']}_result.csv")
+    df.to_csv(result_csv, mode="a", index=False)
 
     # save figure
-    fig.savefig(
-        os.path.join(
-            infer_agent.log_dir,
-            f"{config['model_to_evaluate']}_{config['task_name']}_umap.png",
-        )
-    )
+    fig_path = os.path.join(infer_agent.log_dir, f"{config['task_name']}_umap.png")
+    fig.savefig(fig_path)
 
     # %% add head, tail labels
     # This is the file that contains the head, tail labels for the candidate set for examing the head, tail length distribution
     # You can input your own file here, 
-    if "headtail_label_file" in config:
-        label_df = pd.read_csv(config["headtail_label_file"])
+    if config.get("headtail_label_file"):
+        if os.path.exists(config["headtail_label_file"]):
+            label_df = pd.read_csv(config["headtail_label_file"])
+        else:
+            print(f"Label file {config['headtail_label_file']} not found, skipping.")
+    else:
+        print("No headtail_label_file specified, skipping label loading.")
 
-        # verify data alignment
-        smiles_data_ = dataset.dataset.smiles_data
+    # Only run label_df-related code if label_df is defined
+    if 'label_df' in locals():
         assert len(smiles_data_) == len(label_df)
         for i in range(len(smiles_data_)):
             assert smiles_data_[i] == label_df.iloc[i]["smiles"]
@@ -910,184 +907,184 @@ if __name__ == "__main__":
                 )
             )
 
-    # %% plot against num of atoms
-    smiles_data_ = dataset.dataset.smiles_data
-    num_atoms = [Chem.MolFromSmiles(smiles).GetNumAtoms() for smiles in smiles_data_]
-    num_carbons = [smiles.count("C") for smiles in smiles_data_]
+        # %% plot against num of atoms
+        smiles_data_ = dataset.dataset.smiles_data
+        num_atoms = [Chem.MolFromSmiles(smiles).GetNumAtoms() for smiles in smiles_data_]
+        num_carbons = [smiles.count("C") for smiles in smiles_data_]
 
-    fig, ax = plt.subplots(figsize=(12, 10))
-    im = ax.scatter(
-        infer_agent.umap_emb[:, 0],
-        infer_agent.umap_emb[:, 1],
-        c=num_atoms,
-        s=np.power(pred, 3),
-        cmap="gnuplot2",
-        alpha=0.4,
-        edgecolors="white",
-    )
-    # remove ticks and spines
-    ax.set(xticks=[], yticks=[])
-    ax.set_title("UMAP projection of the dataset", fontsize=24)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-
-    # size legend
-    handles, labels = im.legend_elements(
-        prop="sizes", alpha=0.6, func=lambda x: x ** (1 / 3)
-    )
-    legend = ax.legend(
-        handles,
-        labels,
-        loc="best",
-        title="Predicted efficiency",
-        fontsize=16,
-    )
-
-    ax.add_artist(legend)
-
-    # color bar
-    cbar = fig.colorbar(
-        im,
-        ax=ax,
-        # format="%.1f",
-        orientation="vertical",
-        shrink=0.5,
-    )
-    cbar.ax.tick_params(labelsize=16)
-    cbar.ax.set_ylabel("num atoms", rotation=270, fontsize=16, labelpad=20)
-
-    fig.savefig(
-        os.path.join(
-            infer_agent.log_dir,
-            f"numatoms_{config['model_to_evaluate']}_{config['task_name']}_umap.png",
+        fig, ax = plt.subplots(figsize=(12, 10))
+        im = ax.scatter(
+            infer_agent.umap_emb[:, 0],
+            infer_agent.umap_emb[:, 1],
+            c=num_atoms,
+            s=np.power(pred, 3),
+            cmap="gnuplot2",
+            alpha=0.4,
+            edgecolors="white",
         )
-    )
+        # remove ticks and spines
+        ax.set(xticks=[], yticks=[])
+        ax.set_title("UMAP projection of the dataset", fontsize=24)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
 
-    # %% plot against num of carbons
-    fig, ax = plt.subplots(figsize=(12, 10))
-    im = ax.scatter(
-        infer_agent.umap_emb[:, 0],
-        infer_agent.umap_emb[:, 1],
-        c=num_carbons,
-        s=np.power(pred, 3),
-        cmap="gnuplot2",
-        alpha=0.4,
-        edgecolors="white",
-    )
-    # remove ticks and spines
-    ax.set(xticks=[], yticks=[])
-    ax.set_title("UMAP projection of the dataset", fontsize=24)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-
-    # size legend
-    handles, labels = im.legend_elements(
-        prop="sizes", alpha=0.6, func=lambda x: x ** (1 / 3)
-    )
-    legend = ax.legend(
-        handles,
-        labels,
-        loc="best",
-        title="Predicted efficiency",
-        fontsize=16,
-    )
-
-    ax.add_artist(legend)
-
-    # color bar
-    cbar = fig.colorbar(
-        im,
-        ax=ax,
-        # format="%.1f",
-        orientation="vertical",
-        shrink=0.5,
-    )
-    cbar.ax.tick_params(labelsize=16)
-    cbar.ax.set_ylabel("num carbons", rotation=270, fontsize=16, labelpad=20)
-
-    fig.savefig(
-        os.path.join(
-            infer_agent.log_dir,
-            f"numcarbons_{config['model_to_evaluate']}_{config['task_name']}_umap.png",
+        # size legend
+        handles, labels = im.legend_elements(
+            prop="sizes", alpha=0.6, func=lambda x: x ** (1 / 3)
         )
-    )
-
-    # %% highlight mol in efficieny umap
-    feature_name = "Predicted efficiency"
-    feature_ = pred
-    fig, ax = plt.subplots(figsize=(12, 10), dpi=300)
-    im = ax.scatter(
-        infer_agent.umap_emb[:, 0],
-        infer_agent.umap_emb[:, 1],
-        c=feature_,
-        s=90 * 1000 / len(feature_),
-        cmap="Spectral",
-        alpha=0.9,
-    )
-    # remove ticks and spines
-    ax.set(xticks=[], yticks=[])
-    # ax.set_title(f"UMAP colored by {feature_name}", fontsize=24)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-
-    # # This is for highlighting molecules in the scatter plot, make sure you have the 
-    # # smiles you want to highlight in the list in the config file
-    # smiles_ = config["highlight_smiles"]
-    # mol = Chem.MolFromSmiles(smiles_)
-    # index = smiles_data_.index(smiles_)
-    # pil_img = Draw.MolToImage(mol, size=(150, 150))
-    # # draw an arrow pointing from the emb position to the image
-    # x = [infer_agent.umap_emb[index, 0]]
-    # y = [infer_agent.umap_emb[index, 1]]
-    # titles = [config["highlight_name"]]
-    # colors = ["#7f7f7f"]
-    # _image_scatter(x, y, [pil_img], titles, colors, ax, offset=(0.1, 0.9))
-
-    # find the siles with the highest pred
-    index = np.argmax(pred)
-    smiles_ = smiles_data_[index]
-    mol = Chem.MolFromSmiles(smiles_)
-    pil_img = Draw.MolToImage(mol, size=(150, 150))
-    x = [infer_agent.umap_emb[index, 0]]
-    y = [infer_agent.umap_emb[index, 1]]
-    titles = [f"Predicted efficiency {pred[index]:.2f}"]
-    colors = ["#7f7f7f"]
-    _image_scatter(x, y, [pil_img], titles, colors, ax, offset=(1.2, 0.95))
-
-    # find the siles with the least pred
-    index = np.argmin(pred)
-    smiles_ = smiles_data_[index]
-    mol = Chem.MolFromSmiles(smiles_)
-    pil_img = Draw.MolToImage(mol, size=(150, 150))
-    x = [infer_agent.umap_emb[index, 0]]
-    y = [infer_agent.umap_emb[index, 1]]
-    titles = [f"Predicted efficiency {pred[index]:.2f}"]
-    colors = ["#7f7f7f"]
-    _image_scatter(x, y, [pil_img], titles, colors, ax, offset=(0.1, 0.1))
-
-    # color bar
-    cbar = fig.colorbar(
-        im,
-        ax=ax,
-        # format="%.1f",
-        orientation="vertical",
-        shrink=0.5,
-    )
-    cbar.ax.tick_params(labelsize=16)
-    cbar.ax.set_ylabel(feature_name, rotation=270, fontsize=16, labelpad=20)
-
-    fig.savefig(
-        os.path.join(
-            infer_agent.log_dir,
-            f"{feature_name}_{config['model_to_evaluate']}_{config['task_name']}_umap.png",
+        legend = ax.legend(
+            handles,
+            labels,
+            loc="best",
+            title="Predicted efficiency",
+            fontsize=16,
         )
-    )
+
+        ax.add_artist(legend)
+
+        # color bar
+        cbar = fig.colorbar(
+            im,
+            ax=ax,
+            # format="%.1f",
+            orientation="vertical",
+            shrink=0.5,
+        )
+        cbar.ax.tick_params(labelsize=16)
+        cbar.ax.set_ylabel("num atoms", rotation=270, fontsize=16, labelpad=20)
+
+        fig.savefig(
+            os.path.join(
+                infer_agent.log_dir,
+                f"numatoms_{config['model_to_evaluate']}_{config['task_name']}_umap.png",
+            )
+        )
+
+        # %% plot against num of carbons
+        fig, ax = plt.subplots(figsize=(12, 10))
+        im = ax.scatter(
+            infer_agent.umap_emb[:, 0],
+            infer_agent.umap_emb[:, 1],
+            c=num_carbons,
+            s=np.power(pred, 3),
+            cmap="gnuplot2",
+            alpha=0.4,
+            edgecolors="white",
+        )
+        # remove ticks and spines
+        ax.set(xticks=[], yticks=[])
+        ax.set_title("UMAP projection of the dataset", fontsize=24)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+
+        # size legend
+        handles, labels = im.legend_elements(
+            prop="sizes", alpha=0.6, func=lambda x: x ** (1 / 3)
+        )
+        legend = ax.legend(
+            handles,
+            labels,
+            loc="best",
+            title="Predicted efficiency",
+            fontsize=16,
+        )
+
+        ax.add_artist(legend)
+
+        # color bar
+        cbar = fig.colorbar(
+            im,
+            ax=ax,
+            # format="%.1f",
+            orientation="vertical",
+            shrink=0.5,
+        )
+        cbar.ax.tick_params(labelsize=16)
+        cbar.ax.set_ylabel("num carbons", rotation=270, fontsize=16, labelpad=20)
+
+        fig.savefig(
+            os.path.join(
+                infer_agent.log_dir,
+                f"numcarbons_{config['model_to_evaluate']}_{config['task_name']}_umap.png",
+            )
+        )
+
+        # %% highlight mol in efficieny umap
+        feature_name = "Predicted efficiency"
+        feature_ = pred
+        fig, ax = plt.subplots(figsize=(12, 10), dpi=300)
+        im = ax.scatter(
+            infer_agent.umap_emb[:, 0],
+            infer_agent.umap_emb[:, 1],
+            c=feature_,
+            s=90 * 1000 / len(feature_),
+            cmap="Spectral",
+            alpha=0.9,
+        )
+        # remove ticks and spines
+        ax.set(xticks=[], yticks=[])
+        # ax.set_title(f"UMAP colored by {feature_name}", fontsize=24)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+
+        # # This is for highlighting molecules in the scatter plot, make sure you have the 
+        # # smiles you want to highlight in the list in the config file
+        # smiles_ = config["highlight_smiles"]
+        # mol = Chem.MolFromSmiles(smiles_)
+        # index = smiles_data_.index(smiles_)
+        # pil_img = Draw.MolToImage(mol, size=(150, 150))
+        # # draw an arrow pointing from the emb position to the image
+        # x = [infer_agent.umap_emb[index, 0]]
+        # y = [infer_agent.umap_emb[index, 1]]
+        # titles = [config["highlight_name"]]
+        # colors = ["#7f7f7f"]
+        # _image_scatter(x, y, [pil_img], titles, colors, ax, offset=(0.1, 0.9))
+
+        # find the siles with the highest pred
+        index = np.argmax(pred)
+        smiles_ = smiles_data_[index]
+        mol = Chem.MolFromSmiles(smiles_)
+        pil_img = Draw.MolToImage(mol, size=(150, 150))
+        x = [infer_agent.umap_emb[index, 0]]
+        y = [infer_agent.umap_emb[index, 1]]
+        titles = [f"Predicted efficiency {pred[index]:.2f}"]
+        colors = ["#7f7f7f"]
+        _image_scatter(x, y, [pil_img], titles, colors, ax, offset=(1.2, 0.95))
+
+        # find the siles with the least pred
+        index = np.argmin(pred)
+        smiles_ = smiles_data_[index]
+        mol = Chem.MolFromSmiles(smiles_)
+        pil_img = Draw.MolToImage(mol, size=(150, 150))
+        x = [infer_agent.umap_emb[index, 0]]
+        y = [infer_agent.umap_emb[index, 1]]
+        titles = [f"Predicted efficiency {pred[index]:.2f}"]
+        colors = ["#7f7f7f"]
+        _image_scatter(x, y, [pil_img], titles, colors, ax, offset=(0.1, 0.1))
+
+        # color bar
+        cbar = fig.colorbar(
+            im,
+            ax=ax,
+            # format="%.1f",
+            orientation="vertical",
+            shrink=0.5,
+        )
+        cbar.ax.tick_params(labelsize=16)
+        cbar.ax.set_ylabel(feature_name, rotation=270, fontsize=16, labelpad=20)
+
+        fig.savefig(
+            os.path.join(
+                infer_agent.log_dir,
+                f"{feature_name}_{config['model_to_evaluate']}_{config['task_name']}_umap.png",
+            )
+        )
 
 
 # %% exmol explanation
@@ -1133,64 +1130,63 @@ def model_pred(smiles):
     #     return preds[0]
     return preds
 
-if "highlight_smiles" in config:
-    smiles_ = config["highlight_smiles"]
-    space = exmol.sample_space(smiles_, model_pred, batched=True)
-
-    cfs = exmol.cf_explain(space, 3)
-    exmol.plot_cf(cfs)
-    # get and save plot
-    fig = plt.gcf()
-    fig.savefig(
-        os.path.join(
-            infer_agent.log_dir,
-            f"top_cfs_{config['model_to_evaluate']}_{config['task_name']}.svg",
-        )
-    )
-
-    exmol.plot_space(space, cfs, figure_kwargs={"figsize": (24, 16)}, offset=3)
-    fig = plt.gcf()
-    # extend the layout to make sure the legend is not cut off
-    # fig.tight_layout(pad=40)
-    fig.tight_layout(rect=[0.15, 0.1, 0.7, 0.6])
-    fig.savefig(
-        os.path.join(
-            infer_agent.log_dir,
-            f"cfs_space_{config['model_to_evaluate']}_{config['task_name']}.svg",
-        )
-    )
-
-
-    # %% explain using lime
-    import cairosvg
-
-    exmol.lime_explain(space)
-    svg = exmol.plot_descriptors(space, return_svg=True)
-    cairosvg.svg2svg(
-        bytestring=svg,
-        write_to=os.path.join(
-            infer_agent.log_dir,
-            f"lime_MACCS_{config['model_to_evaluate']}_{config['task_name']}.svg",
-        ),
-    )
-
-    # %% explain using lime on molecule substructures
-    exmol.lime_explain(space, descriptor_type="ECFP")
-    svg = exmol.plot_descriptors(space, return_svg=True)
-    cairosvg.svg2svg(
-        bytestring=svg,
-        write_to=os.path.join(
-            infer_agent.log_dir,
-            f"lime_ECFP_{config['model_to_evaluate']}_{config['task_name']}.svg",
-        ),
-    )
-
-    # most explaining substructure
-    svg = exmol.plot_utils.similarity_map_using_tstats(space[0], return_svg=True)
-    cairosvg.svg2svg(
-        bytestring=svg,
-        write_to=os.path.join(
-            infer_agent.log_dir,
-            f"lime_ECFP_most_explaining_{config['model_to_evaluate']}_{config['task_name']}.svg",
-        ),
-    )
+# if "highlight_smiles" in config:
+#     smiles_ = config["highlight_smiles"]
+#     space = exmol.sample_space(smiles_, model_pred, batched=True)
+#
+#     cfs = exmol.cf_explain(space, 3)
+#     exmol.plot_cf(cfs)
+#     # get and save plot
+#     fig = plt.gcf()
+#     fig.savefig(
+#         os.path.join(
+#             infer_agent.log_dir,
+#             f"top_cfs_{config['model_to_evaluate']}_{config['task_name']}.svg",
+#         )
+#     )
+#
+#     exmol.plot_space(space, cfs, figure_kwargs={"figsize": (24, 16)}, offset=3)
+#     fig = plt.gcf()
+#     # extend the layout to make sure the legend is not cut off
+#     # fig.tight_layout(pad=40)
+#     fig.tight_layout(rect=[0.15, 0.1, 0.7, 0.6])
+#     fig.savefig(
+#         os.path.join(
+#             infer_agent.log_dir,
+#             f"cfs_space_{config['model_to_evaluate']}_{config['task_name']}.svg",
+#         )
+#     )
+#
+#     # %% explain using lime
+#     import cairosvg
+#
+#     exmol.lime_explain(space)
+#     svg = exmol.plot_descriptors(space, return_svg=True)
+#     cairosvg.svg2svg(
+#         bytestring=svg,
+#         write_to=os.path.join(
+#             infer_agent.log_dir,
+#             f"lime_MACCS_{config['model_to_evaluate']}_{config['task_name']}.svg",
+#         ),
+#     )
+#
+#     # %% explain using lime on molecule substructures
+#     exmol.lime_explain(space, descriptor_type="ECFP")
+#     svg = exmol.plot_descriptors(space, return_svg=True)
+#     cairosvg.svg2svg(
+#         bytestring=svg,
+#         write_to=os.path.join(
+#             infer_agent.log_dir,
+#             f"lime_ECFP_{config['model_to_evaluate']}_{config['task_name']}.svg",
+#         ),
+#     )
+#
+#     # most explaining substructure
+#     svg = exmol.plot_utils.similarity_map_using_tstats(space[0], return_svg=True)
+#     cairosvg.svg2svg(
+#         bytestring=svg,
+#         write_to=os.path.join(
+#             infer_agent.log_dir,
+#             f"lime_ECFP_most_explaining_{config['model_to_evaluate']}_{config['task_name']}.svg",
+#         ),
+#     )
